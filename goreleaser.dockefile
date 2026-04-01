@@ -1,0 +1,29 @@
+FROM alpine:3
+
+
+ARG TARGETPLATFORM
+ARG VERSION
+ENV VERSION=$VERSION
+
+WORKDIR /app/
+RUN apk update --no-cache && apk upgrade && apk add --no-cache ca-certificates
+
+
+RUN addgroup -S mesh && adduser -S mesh -G mesh
+
+COPY $TARGETPLATFORM/goed2kd /usr/local/bin/goed2kd
+
+# 默认配置（与仓库 configs/config.docker.json 一致；容器内需 0.0.0.0 + allow_remote）
+COPY configs/config.docker.json /app/data/config/config.json
+
+# 為非 root 用戶預先建立並授權數據目錄
+
+RUN mkdir -p /app/data/downloads /app/data/state /app/data/logs \
+	&& chown -R mesh:mesh /app
+
+USER mesh
+
+EXPOSE 18080/tcp 4661/tcp 4662/udp
+
+ENTRYPOINT ["/usr/local/bin/goed2kd"]
+CMD ["-config", "/app/data/config/config.json"]

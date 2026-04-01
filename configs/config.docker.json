@@ -1,0 +1,45 @@
+{
+  "rpc": {
+    "listen": "0.0.0.0:18080",
+    "allow_remote": true,
+    "auth_token": "change-me",
+    "read_timeout_seconds": 15,
+    "write_timeout_seconds": 15
+  },
+  "engine": {
+    "listen_port": 4661,
+    "udp_port": 4662,
+    "enable_dht": true,
+    "enable_upnp": true,
+    "peer_connection_timeout": 30,
+    "reconnect_to_server": true,
+    "max_connections_per_second": 10,
+    "session_connections_limit": 20,
+    "upload_slots": 3,
+    "max_upload_rate_kb": 0,
+    "default_download_dir": "./data/downloads"
+  },
+  "bootstrap": {
+    "server_addresses": [
+      "45.82.80.155:5687"
+    ],
+    "server_met_urls": [
+      "http://upd.emule-security.org/server.met"
+    ],
+    "nodes_dat_urls": [
+      "https://upd.emule-security.org/nodes.dat"
+    ],
+    "kad_nodes": []
+  },
+  "state": {
+    "enabled": true,
+    "path": "./data/state/client-state.json",
+    "load_on_start": true,
+    "save_on_exit": true,
+    "auto_save_interval_seconds": 30
+  },
+  "logging": {
+    "level": "info",
+    "path": "./data/logs/goed2kd.log"
+  }
+}

@@ -4,10 +4,7 @@ version: 2
 project_name: goed2kd
 before:
   hooks:
-    # You may remove this if you don't use go modules.
     - go mod tidy
-    # you may remove this if you don't need go generate
-    - go generate ./...
 builds:
   - env:
       - CGO_ENABLED=0
@@ -62,5 +59,4 @@ dockers_v2:
       - linux/arm64
     dockerfile: "goreleaser.dockefile"
     extra_files:
-      - configs/config.example.yaml
-      - configs/config.docker.yaml
+      - configs/config.docker.json
