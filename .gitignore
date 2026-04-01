@@ -1,3 +1,5 @@
 bin/
 # 运行时数据：配置含 token、状态、下载、日志等，勿提交
 data/
+.gocache/
+dist/
