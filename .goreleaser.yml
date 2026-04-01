@@ -6,19 +6,15 @@ before:
   hooks:
     - go mod tidy
 builds:
-  - env:
+  - id: goed2kd
+    env:
       - CGO_ENABLED=0
     main: ./cmd/goed2kd
     flags:
       - -trimpath
       - -buildvcs=false
     ldflags:
-      - -s -w 
-    asmflags:
-      # - all=-trimpath={{.Env.GOPATH}}
-      - ./dontoptimizeme=-N
-    gcflags:
-      # - all=-trimpath={{.Env.GOPATH}}
+      - -s -w
 
 archives:
   -
@@ -49,8 +45,10 @@ changelog:
       - '^test:'
 
 dockers_v2:
-  - images:
-      - "chenjia404/{{.ProjectName}}"
+  - ids:
+      - goed2kd
+    images:
+      - "ghcr.io/chenjia404/{{.ProjectName}}"
     tags:
       - "latest"
       - "dev"
@@ -60,3 +58,8 @@ dockers_v2:
     dockerfile: "goreleaser.dockefile"
     extra_files:
       - configs/config.docker.json
+    # 关闭 SBOM/attest（默认 docker 驱动不支持 attestation，会报 “Attestation is not supported for the docker driver”）
+    sbom: false
+    flags:
+      - "--provenance=false"
+      - "--sbom=false"

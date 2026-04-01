@@ -1,3 +1,5 @@
+# 镜像推送到 ghcr.io，需 permissions.packages: write；登录使用内置 GITHUB_TOKEN。
+# 若 Release 使用自定义 PAT（GORELEASER_GITHUB_TOKEN），请确保该 PAT 含 repo + write:packages，或仅将 docker login 的 password 改为该 PAT。
 name: goreleaser
 
 on:
@@ -8,8 +10,7 @@ on:
 
 permissions:
   contents: write
-  # packages: write
-  # issues: write
+  packages: write
 
 jobs:
   goreleaser:
@@ -21,11 +22,21 @@ jobs:
       - run: git fetch --force --tags
       - uses: actions/setup-go@v6
         with:
-          go-version: '>=1.26'
+          go-version-file: go.mod
           cache: true
-      # More assembly might be required: Docker logins, GPG, etc. It all depends
-      # on your needs.
-      - run: go install mvdan.cc/garble@latest
+      # 在 amd64 runner 上构建 arm64 镜像需要 QEMU
+      - uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          # 使用 docker-container 驱动，与多架构 / attest 兼容；见 https://docs.docker.com/go/attestations/
+          driver: docker-container
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - uses: goreleaser/goreleaser-action@v7
         with:
           # either 'goreleaser' (default) or 'goreleaser-pro':
@@ -33,7 +44,6 @@ jobs:
           version: latest
           args: release --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.GORELEASER_GITHUB_TOKEN }}
-          # Your GoReleaser Pro key, if you are using the 'goreleaser-pro'
-          # distribution:
-          # GORELEASER_KEY: ${{ secrets.GORELEASER_GITHUB_TOKEN }}
+          BUILDX_NO_DEFAULT_ATTESTATIONS: "1"
+          # 与 ghcr 推送共用：需 contents:write + packages:write（已在 permissions 中）
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
