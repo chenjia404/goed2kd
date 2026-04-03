@@ -15,6 +15,22 @@ builds:
       - -buildvcs=false
     ldflags:
       - -s -w
+    # 默认仅含 linux/amd64 等少数组合，需显式列出才会产出 Linux ARM 等架构
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+      - arm
+    goarm:
+      - "7"
+    ignore:
+      - goos: darwin
+        goarch: arm
+      - goos: windows
+        goarch: arm
 
 archives:
   -
